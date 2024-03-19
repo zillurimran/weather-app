@@ -1,4 +1,6 @@
 <script setup>
+  import { useWeatherStore } from './stores/weather';
+  const weatherStore = useWeatherStore();
 </script>
 
 <template>
@@ -6,21 +8,28 @@
       <div class="wrap">
         <!-- search -->
         <div class="search_box">
-          <input type="text" class="search_bar" placeholder="search...">
+          <input type="text" class="search_bar" placeholder="Search with city name..." v-model="weatherStore.location_query" @keypress="weatherStore.fetchWeather">
         </div>
 
         <!-- weather Information -->
-        <div class="weather_info">
+        <div class="weather_info" v-if="weatherStore.weather.main!=undefined">
           <div class="location_box">
-            <div class="location">Dhaka</div>
-            <div class="date">12/23/2030</div>
+            <div class="location">{{ weatherStore.weather.name }}, {{ weatherStore.weather.sys.country }}</div>
+            <div class="date">{{ new Date().toDateString() }}</div>
           </div>
         </div>
 
         <!-- weather box -->
-        <div class="weather_box">
-          <div class="temp">22 °C</div>
-          <div class="weather">adasd</div>
+        <div class="weather_box" v-if="weatherStore.weather.main!=undefined">
+          <div class="temp">{{ weatherStore.weather.main.temp }} °C</div>
+          <div class="weather">{{ weatherStore.weather.weather[0].main }}</div>
+          <div class="icon">
+            <img :src="`https://openweathermap.org/img/wn/${weatherStore.weather.weather[0].icon}@2x.png`" alt="">
+          </div>
+          <div class="other_info">
+            <span class="pressure">Pressure: {{ weatherStore.weather.main.pressure }} mb</span>
+            <span class="pressure">Humidity: {{ weatherStore.weather.main.humidity }} %</span>
+          </div>
         </div>
       </div>
     </div>
@@ -47,7 +56,7 @@
     box-shadow: 0px 0px 30px #000065;
   }
   .wrap{
-    height: 600px;
+    height: 700px;
     padding: 25px;
     border-radius: 25px;
     background-image: linear-gradient(to bottom, rgba(0,0,0,0.15));
@@ -95,7 +104,7 @@
 
   .weather_box .temp{
     display: inline-block;
-    padding:10px 25px ;
+    padding:10px 15px ;
     color: white;
     font-size: 100px;
     font-weight: 900;
@@ -113,5 +122,14 @@
     font-weight: 700;
     font-style: italic;
     text-shadow: 3px 6px rgba(0,0,0, 0.25);
+  }
+  .other_info{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .pressure{
+    color: white;
+    font-size: 18px;
   }
 </style>
